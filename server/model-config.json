@@ -39,11 +39,11 @@
     "dataSource": "db",
     "public": true
   },
-  "Bets": {
+  "Rank": {
     "dataSource": "db",
     "public": true
   },
-  "Rank": {
+  "Matches": {
     "dataSource": "db",
     "public": true
   }

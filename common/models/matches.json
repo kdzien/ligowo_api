@@ -1,33 +1,31 @@
 {
-  "name": "groups",
+  "name": "Matches",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
+    "group_id": {
+      "type": "string",
+      "required": true
+    },
     "name": {
       "type": "string",
       "required": true
     },
-    "admin": {
-      "type": "string"
+    "date": {
+      "type": "string",
+      "required": true
     },
-    "users": {
+    "bets": {
       "type": [
-        "string"
+        "object"
       ]
     }
   },
   "validations": [],
   "relations": {},
-  "acls": [
-    {
-      "accessType": "*",
-      "principalType": "ROLE",
-      "principalId": "$unauthenticated",
-      "permission": "DENY"
-    }
-  ],
+  "acls": [],
   "methods": {}
 }

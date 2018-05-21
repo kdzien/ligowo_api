@@ -1,30 +1,65 @@
 'use strict';
 
 module.exports = function(Groups) {
-  // Groups.status = function(cb) {
-  //   var currentDate = new Date();
-  //   var currentHour = currentDate.getHours();
-  //   var OPEN_HOUR = 6;
-  //   var CLOSE_HOUR = 20;
-  //   console.log('Current hour is %d', currentHour);
-  //   var response;
-  //   if (currentHour >= OPEN_HOUR && currentHour < CLOSE_HOUR) {
-  //     response = 'We are open for business.';
-  //   } else {
-  //     response = 'Sorry, we are closed. Open daily from 6am to 8pm.';
-  //   }
-  //   cb(null, response);
-  // };
-  // Groups.remoteMethod(
-  //   'status', {
-  //     http: {
-  //       path: '/status',
-  //       verb: 'get'
-  //     },
-  //     returns: {
-  //       arg: 'status',
-  //       type: 'string'
-  //     }
-  //   }
-  // );
+  Groups.join = function(uid,gid,cb) {
+    console.log(gid)
+    Groups.findOne({
+      where:{"id": `${gid}`}
+    },(err,group)=>{
+      if(err){cb(err)}
+      else{
+        console.log(group)
+        let oldUsers = group.users;
+        if(oldUsers.indexOf(uid)!==-1){
+          cb(null,{message:"Już należysz do tej grupy"})
+        }
+        else{
+          let newUsers = group.users;
+          newUsers.push(uid);
+          group.updateAttributes({users:newUsers},(err,instance)=>{
+          if(err){cb(err)}
+          else{
+            cb(null, "Zostałeś dodany do grupy!");
+          }
+        })
+        }
+      }
+    })
+  };
+  Groups.usergroups = function(uid,cb) {
+    Groups.find({
+      where:{"users": `${uid}`}
+    },(err,groups)=>{
+      if(err){cb(null,err)}
+      else{
+        cb(null, groups);
+      }
+    })
+  };
+  Groups.remoteMethod(
+    'join', {
+      http: {
+        path: '/join/:gid/:uid',
+        verb: 'patch'
+      },
+      'accepts': [{ arg: 'uid', type: 'string' },{ arg: 'gid', type: 'string' }],
+      returns: {
+        arg: 'status',
+        type: 'object'
+      }
+    }
+  );
+  Groups.remoteMethod(
+    'usergroups', {
+      http: {
+        path: '/usergroups/:uid',
+        verb: 'get'
+      },
+      'accepts': [{ arg: 'uid', type: 'string' }],
+      returns: {
+        arg: 'status',
+        type: 'object'
+      }
+    }
+  );
 };
