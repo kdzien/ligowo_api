@@ -3,28 +3,30 @@
 module.exports = function(Matches) {
     Matches.getFinished = function(uid,gid,cb) {
     let current_date = new Date();
-    console.log(gid)
     Matches.find(
-        {"where" : {"group_id" : { "like" : "5b02b39167d9042a5025bb20"}}}
+        {"where" : {"group_id" : { "like" : gid}}}
       ,(err,matches)=>{
       if(err){
-        console.log(err)
         cb(null,{error:err})
       }else{
         let returnArray = [];
-        console.log(matches)
+        function containsObject(user, bets) {
+          var i;
+          for (i = 0; i < bets.length; i++) {
+              if (bets[i].user_id === user) {
+                  return true;
+              }
+          }
+          return false;
+      }
         matches.forEach((match,i)=>{
-            console.log(i)
-            match.bets.forEach((elem,j)=>{
-                console.log(j)
-                if(elem.user_id==uid){
-                    returnArray.push(match)
-                    if(i==matches.length-1 && j==elem.length-1){
-                        console.log("cb")
-                        cb(null,returnArray)
-                    };
-                }
-            })
+          console.log(match)
+          if(!containsObject(uid,match.bets)){
+            returnArray.push(match)
+          }
+          if(i==matches.length-1){
+            cb(null,returnArray)
+          }
         })
       }
 
