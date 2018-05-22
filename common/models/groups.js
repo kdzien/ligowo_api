@@ -28,7 +28,7 @@ module.exports = function(Groups) {
   };
   Groups.usergroups = function(uid,cb) {
     Groups.find({
-      where:{"users": `${uid}`}
+      where:{"users": {"like":`${uid}`}}
     },(err,groups)=>{
       if(err){cb(null,err)}
       else{
@@ -57,7 +57,7 @@ module.exports = function(Groups) {
       },
       'accepts': [{ arg: 'uid', type: 'string' }],
       returns: {
-        arg: 'status',
+        arg: 'data',
         type: 'object'
       }
     }
