@@ -43,7 +43,11 @@
     "dataSource": "db",
     "public": true
   },
-  "Matches": {
+  "Bet": {
+    "dataSource": "db",
+    "public": true
+  },
+  "Match": {
     "dataSource": "db",
     "public": true
   }

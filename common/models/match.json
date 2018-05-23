@@ -1,0 +1,29 @@
+{
+  "name": "Match",
+  "base": "PersistedModel",
+  "idInjection": true,
+  "options": {
+    "validateUpsert": true
+  },
+  "properties": {
+    "name": {
+      "type": "string"
+    },
+    "date": {
+      "type": "string"
+    },
+    "group_id": {
+      "type": "string"
+    }
+  },
+  "validations": [],
+  "relations": {
+    "bets": {
+      "type": "hasMany",
+      "model": "Bet",
+      "foreignKey": "matchId"
+    }
+  },
+  "acls": [],
+  "methods": {}
+}

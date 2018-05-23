@@ -1,31 +1,28 @@
 {
-  "name": "Matches",
+  "name": "Bet",
   "base": "PersistedModel",
   "idInjection": true,
   "options": {
     "validateUpsert": true
   },
   "properties": {
-    "group_id": {
+    "user_id": {
+      "type": "string"
+    },
+    "type": {
       "type": "string",
       "required": true
     },
-    "name": {
-      "type": "string",
-      "required": true
+    "status": {
+      "type": "number",
+      "required": true,
+      "default": 0
     },
     "date": {
-      "type": "string",
-      "required": true
-    },
-    "bets": {
-      "type": [
-        "object"
-      ]
+      "type": "string"
     }
   },
   "validations": [],
-  "relations": {},
   "acls": [],
   "methods": {}
 }

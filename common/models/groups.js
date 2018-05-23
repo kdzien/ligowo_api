@@ -8,27 +8,31 @@ module.exports = function(Groups) {
     },(err,group)=>{
       if(err){cb(err)}
       else{
-        console.log(group)
-        let oldUsers = group.users;
-        if(oldUsers.indexOf(uid)!==-1){
-          cb(null,{message:"Już należysz do tej grupy"})
-        }
-        else{
-          let newUsers = group.users;
-          newUsers.push(uid);
-          group.updateAttributes({users:newUsers},(err,instance)=>{
-          if(err){cb(err)}
-          else{
-            cb(null, "Zostałeś dodany do grupy!");
+        if(!group){
+          cb(null,"Nie ma takiej grupy, spróbuj ponownie")
+        }else{
+          let oldUsers = group.users;
+          if(oldUsers.indexOf(uid)!==-1){
+            cb(null,"Już należysz do tej grupy")
           }
-        })
+          else{
+            let newUsers = group.users;
+            newUsers.push(uid);
+            group.updateAttributes({users:newUsers},(err,instance)=>{
+            if(err){cb(err)}
+            else{
+              cb(null, "Zostałeś dodany do grupy!");
+            }
+          })
         }
+        }
+
       }
     })
   };
   Groups.usergroups = function(uid,cb) {
     Groups.find({
-      where:{"users": {"like":`${uid}`}}
+      where:{"users": {"like" : `${uid.toString()}`} }
     },(err,groups)=>{
       if(err){cb(null,err)}
       else{
@@ -58,7 +62,7 @@ module.exports = function(Groups) {
       'accepts': [{ arg: 'uid', type: 'string' }],
       returns: {
         arg: 'data',
-        type: 'object'
+        type: 'array'
       }
     }
   );
