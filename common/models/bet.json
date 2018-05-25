@@ -23,13 +23,7 @@
     }
   },
   "validations": [],
-  "relations": {
-    "matches": {
-      "type": "belongsTo",
-      "model": "Match",
-      "foreignKey": ""
-    }
-  },
+
   "acls": [],
   "methods": {}
 }

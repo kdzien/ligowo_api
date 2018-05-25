@@ -3,19 +3,20 @@
 module.exports = function(Match) {
 
   Match.matches = function(uid,gid,cb) {
+    console.log(gid)
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
           let matchesIds = [];
           matches.forEach(elem=>{
               matchesIds.push(elem.id)
           })
-          console.log(matchesIds)
           Match.app.models.Bet.find({"where":{"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
               let noMatch = [];
               bets.forEach(elem=>{
                   noMatch.push(elem.matchId)
               })
               console.log(noMatch)
-              Match.find({"where":{ "id":{"nin": noMatch}}},(err,matchesr)=>{
+              Match.find({"where":{"group_id": {"like":`${gid.toString()}`}, "id":{"nin": noMatch}}},(err,matchesr)=>{
+                console.log(matchesr)
                   cb(null,matchesr)
               })
           })
@@ -28,7 +29,7 @@ module.exports = function(Match) {
           matches.forEach(elem=>{
               matchesIds.push(elem.id)
           })
-          Match.app.models.Bet.find({"where":{"date":{lt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
+          Match.app.models.Bet.find({"where":{"date":{gt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
                 let n = 0;
                 (function async(){
                   if(n<=bets.length-1){
@@ -53,7 +54,7 @@ module.exports = function(Match) {
           matches.forEach(elem=>{
               matchesIds.push(elem.id)
           })
-          Match.app.models.Bet.find({"where":{"date":{gt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}},include: 'matches'},(err,bets)=>{
+          Match.app.models.Bet.find({"where":{"date":{lt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}},include: 'matches'},(err,bets)=>{
             let n = 0;
             (function async(){
               if(n<=bets.length-1){
