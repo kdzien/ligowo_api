@@ -1,25 +1,26 @@
 'use strict';
 
 module.exports = function(Match) {
-  Match.updateRank = function(uid,gid,cb) {
-    Match.find({"where":{"group_id": {"like":`${gid.toString()}`},"score":{"nlike":0},"date":{lt:new Date().yyyymmddhhmm()}}},(err,matches)=>{
+  Match.updateRank = function(gid,cb) {
+    Match.find({"where":{"group_id": {"like":`${gid.toString()}`},"score":{"nlike":'3'},"date":{lt:new Date().yyyymmddhhmm()}}},(err,matches)=>{
       if(err){
         throw new Error(err)
       }else{
         let n = 0;
         (function async(){
           if(n<=matches.length-1){
-            Match.app.models.Bet.find({"where":{'matchId':{"like":`${match.id}`}}},(err,bets)=>{
+            Match.app.models.Bet.find({"where":{"matchId":`${matches[n].id}`,"status":{"neq":'1'}}},(err,bets)=>{
               let j = 0;
               (function async2(){
                 if(j<=bets.length-1){
                   let win;
-                  bet.type==match.score ? win=true : win=false;
-                  bet.updateAttributes({status:1},(err,instance)=>{
+                  bets[j].type==matches[n].score ? win=true : win=false;
+                  //status 1 - trafiony status 2 - nietrafiony status 0 - nierozliczony dopisac!
+                  bets[j].updateAttributes({status:1},(err,betinst)=>{
                     if(win==true){
-                      Match.app.models.Rank.find({"where":{"group_id": {"like":`${gid.toString()}`},"user_id": {"like":`${bet.user_id}`}}},(err,stat)=>{
+                      Match.app.models.Rank.findOne({"where":{"group_id": {"like":`${gid.toString()}`},"user_id": {"like":`${bets[j].user_id}`}}},(err,stat)=>{
                         let newRank = stat.rank +1;
-                        rank.updateAttributes({rank:newRank},(err,instance)=>{
+                        stat.updateAttributes({rank:newRank},(err,rankinst)=>{
                           j++;async2();
                         })
                       })
@@ -31,19 +32,17 @@ module.exports = function(Match) {
                   n++;async();
                 }
               })()
-            })()
-          }else{
+            })
+          } else{
             cb(null,"Zaaktualizowano ranking");
           }
+
         })()
       }
     });
-  };  
+  };
 
   Match.matches = function(uid,gid,cb) {
-    Match.app.models.Rank.find({},(err,ranks)=>{
-      console.log(ranks)
-    })
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
           let matchesIds = [];
           matches.forEach(elem=>{
@@ -86,11 +85,10 @@ module.exports = function(Match) {
       })
   };
   Match.allGroupMatches = function(gid,cb) {
-    Match.find({"where":{"group_id": {"like":`${gid.toString()}`},"score": 0,"date":{lt:new Date().yyyymmddhhmm()}}},(err,matches)=>{
+    Match.find({"where":{"group_id": {"like":`${gid.toString()}`},"score": 3,"date":{lt:new Date().yyyymmddhhmm()}}},(err,matches)=>{
       if(err){
         throw new Error(err)
       }else{
-        console.log(matches)
         cb(null,matches)
       }
     });
@@ -146,7 +144,7 @@ module.exports = function(Match) {
         }
     }
   );
-  
+
   Match.remoteMethod(
     'userMatchesLeft', {
         http: {
