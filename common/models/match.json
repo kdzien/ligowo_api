@@ -16,6 +16,10 @@
     "date": {
       "type": "string"
     },
+    "score": {
+      "type": "number",
+      "default": 0
+    },
     "group_id": {
       "type": "string"
     }

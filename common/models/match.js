@@ -3,7 +3,6 @@
 module.exports = function(Match) {
 
   Match.matches = function(uid,gid,cb) {
-    console.log(gid)
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
           let matchesIds = [];
           matches.forEach(elem=>{
@@ -14,9 +13,7 @@ module.exports = function(Match) {
               bets.forEach(elem=>{
                   noMatch.push(elem.matchId)
               })
-              console.log(noMatch)
-              Match.find({"where":{"group_id": {"like":`${gid.toString()}`}, "id":{"nin": noMatch}}},(err,matchesr)=>{
-                console.log(matchesr)
+              Match.find({"where":{"group_id": {"like":`${gid.toString()}`}, "id":{"nin": noMatch},"date":{gt:new Date().yyyymmddhhmm()}}},(err,matchesr)=>{
                   cb(null,matchesr)
               })
           })
@@ -47,6 +44,16 @@ module.exports = function(Match) {
           })
       })
   };
+  Match.allGroupMatches = function(gid,cb) {
+    Match.find({"where":{"group_id": {"like":`${gid.toString()}`},"score": 0,"date":{lt:new Date().yyyymmddhhmm()}}},(err,matches)=>{
+      if(err){
+        throw new Error(err)
+      }else{
+        console.log(matches)
+        cb(null,matches)
+      }
+    });
+  };
 
   Match.userMatchesDone = function(uid,gid,cb) {
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
@@ -72,6 +79,19 @@ module.exports = function(Match) {
           })
       })
   };
+  Match.remoteMethod(
+    'allGroupMatches', {
+        http: {
+        path: '/bets/groupMatches/:gid',
+        verb: 'get'
+        },
+        'accepts': [{ arg: 'gid', type: 'string' }],
+        returns: {
+          type: ['match'],
+          root:true
+        }
+    }
+  );
 
   Match.remoteMethod(
     'userMatchesLeft', {
