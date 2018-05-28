@@ -1,8 +1,49 @@
 'use strict';
 
 module.exports = function(Match) {
+  Match.updateRank = function(uid,gid,cb) {
+    Match.find({"where":{"group_id": {"like":`${gid.toString()}`},"score":{"nlike":0},"date":{lt:new Date().yyyymmddhhmm()}}},(err,matches)=>{
+      if(err){
+        throw new Error(err)
+      }else{
+        let n = 0;
+        (function async(){
+          if(n<=matches.length-1){
+            Match.app.models.Bet.find({"where":{'matchId':{"like":`${match.id}`}}},(err,bets)=>{
+              let j = 0;
+              (function async2(){
+                if(j<=bets.length-1){
+                  let win;
+                  bet.type==match.score ? win=true : win=false;
+                  bet.updateAttributes({status:1},(err,instance)=>{
+                    if(win==true){
+                      Match.app.models.Rank.find({"where":{"group_id": {"like":`${gid.toString()}`},"user_id": {"like":`${bet.user_id}`}}},(err,stat)=>{
+                        let newRank = stat.rank +1;
+                        rank.updateAttributes({rank:newRank},(err,instance)=>{
+                          j++;async2();
+                        })
+                      })
+                    }else{
+                      j++;async2();
+                    }
+                  })
+                }else{
+                  n++;async();
+                }
+              })()
+            })()
+          }else{
+            cb(null,"Zaaktualizowano ranking");
+          }
+        })()
+      }
+    });
+  };  
 
   Match.matches = function(uid,gid,cb) {
+    Match.app.models.Rank.find({},(err,ranks)=>{
+      console.log(ranks)
+    })
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
           let matchesIds = [];
           matches.forEach(elem=>{
@@ -92,7 +133,20 @@ module.exports = function(Match) {
         }
     }
   );
-
+  Match.remoteMethod(
+    'updateRank', {
+        http: {
+        path: '/updateRank/:gid',
+        verb: 'get'
+        },
+        'accepts': [{ arg: 'gid', type: 'string' }],
+        returns: {
+          type: 'string',
+          root:true
+        }
+    }
+  );
+  
   Match.remoteMethod(
     'userMatchesLeft', {
         http: {
