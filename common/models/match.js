@@ -13,12 +13,12 @@ module.exports = function(Match) {
               let j = 0;
               (function async2(){
                 if(j<=bets.length-1){
-                  let win;
+                  let win,status;
                   bets[j].type==matches[n].score ? win=true : win=false;
-                  //status 1 - trafiony status 2 - nietrafiony status 0 - nierozliczony dopisac!
-                  bets[j].updateAttributes({status:1},(err,betinst)=>{
+                  win==true ? status=1 : status=2;
+                  bets[j].updateAttributes({status:status},(err,betinst)=>{
                     if(win==true){
-                      Match.app.models.Rank.findOne({"where":{"group_id": {"like":`${gid.toString()}`},"user_id": {"like":`${bets[j].user_id}`}}},(err,stat)=>{
+                      Match.app.models.Rank.findOrCreate({"where":{"group_id": {"like":`${gid.toString()}`},"user_id": {"like":`${bets[j].user_id}`}}},{group_id:gid,user_id:bets[j].user_id,rank:0},(err,stat)=>{
                         let newRank = stat.rank +1;
                         stat.updateAttributes({rank:newRank},(err,rankinst)=>{
                           j++;async2();
@@ -66,6 +66,7 @@ module.exports = function(Match) {
           matches.forEach(elem=>{
               matchesIds.push(elem.id)
           })
+          console.log()
           Match.app.models.Bet.find({"where":{"date":{gt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
                 let n = 0;
                 (function async(){
@@ -96,11 +97,13 @@ module.exports = function(Match) {
 
   Match.userMatchesDone = function(uid,gid,cb) {
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
+        console.log(matches)
           let matchesIds = [];
           matches.forEach(elem=>{
               matchesIds.push(elem.id)
           })
           Match.app.models.Bet.find({"where":{"date":{lt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}},include: 'matches'},(err,bets)=>{
+
             let n = 0;
             (function async(){
               if(n<=bets.length-1){

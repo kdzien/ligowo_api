@@ -5,10 +5,14 @@ module.exports = function(server) {
     Date.prototype.yyyymmddhhmm = function() {
       var mm = this.getMonth() + 1; // getMonth() is zero-based
       var dd = this.getDate();
+      var hh = this.getHours();
+      var mmm = this.getMinutes();
     
       return [this.getFullYear(),
               (mm>9 ? '' : '0') + mm,
-              (dd>9 ? '' : '0') + dd, this.getHours(),this.getMinutes()
+              (dd>9 ? '' : '0') + dd,
+              (hh>9 ? '' : '0') + hh,
+              (mmm>9 ? '' : '0') + mmm,
              ].join('');
     };
   })()

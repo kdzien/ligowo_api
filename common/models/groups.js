@@ -1,8 +1,8 @@
 'use strict';
 
 module.exports = function(Groups) {
-  Groups.join = function(uid,gid,cb) {
-    console.log(gid)
+  Groups.join = function(email,gid,cb) {
+    console.log(email)
     Groups.findOne({
       where:{"id": `${gid}`}
     },(err,group)=>{
@@ -12,21 +12,26 @@ module.exports = function(Groups) {
           cb(null,"Nie ma takiej grupy, spróbuj ponownie")
         }else{
           let oldUsers = group.users;
-          if(oldUsers.indexOf(uid)!==-1){
-            cb(null,"Już należysz do tej grupy")
-          }
-          else{
-            let newUsers = group.users;
-            newUsers.push(uid);
-            group.updateAttributes({users:newUsers},(err,instance)=>{
-            if(err){cb(err)}
+          Groups.app.models.User.findOne({where:{"email":email}},(err,user) => {
+            console.log(user)
+            if(!user){
+              cb(null,"Nie ma takiego użytkownika")
+            }
+            else if(oldUsers.indexOf(user.id)!==-1){
+              cb(null,"Użytkownik należy już do tej grupy")
+            }
             else{
-              cb(null, "Zostałeś dodany do grupy!");
+              let newUsers = group.users;
+              newUsers.push(user.id);
+              group.updateAttributes({users:newUsers},(err,instance)=>{
+              if(err){cb(err)}
+              else{
+                cb(null, "Zostałeś dodany do grupy!");
+              }
+              })
             }
           })
         }
-        }
-
       }
     })
   };
