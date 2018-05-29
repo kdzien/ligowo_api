@@ -1,3 +1,4 @@
+let setError = require('./errors.js')
 'use strict';
 
 module.exports = function(Groups) {
@@ -6,27 +7,28 @@ module.exports = function(Groups) {
     Groups.findOne({
       where:{"id": `${gid}`}
     },(err,group)=>{
-      if(err){cb(err)}
+      if(err){
+        return cb(setError(err,400))
+      }
       else{
         if(!group){
-          cb(null,"Nie ma takiej grupy, spróbuj ponownie")
+          return cb(setError("Nie ma takiej grupy",400))
         }else{
           let oldUsers = group.users;
           Groups.app.models.User.findOne({where:{"email":email}},(err,user) => {
-            console.log(user)
             if(!user){
-              cb(null,"Nie ma takiego użytkownika")
+              return cb(setError("Nie ma takiego użytkownika",400))
             }
-            else if(oldUsers.indexOf(user.id)!==-1){
-              cb(null,"Użytkownik należy już do tej grupy")
+            else if(oldUsers.indexOf(user.id.toString())!==-1){
+              return cb(setError("Użytkownik już należy do tej grupy",400))
             }
             else{
               let newUsers = group.users;
               newUsers.push(user.id);
               group.updateAttributes({users:newUsers},(err,instance)=>{
-              if(err){cb(err)}
+              if(err){return cb(setError(err,400))}
               else{
-                cb(null, "Zostałeś dodany do grupy!");
+                cb(null, instance);
               }
               })
             }
@@ -39,7 +41,7 @@ module.exports = function(Groups) {
     Groups.find({
       where:{"users": {"like" : `${uid.toString()}`} }
     },(err,groups)=>{
-      if(err){cb(null,err)}
+      if(err){return cb(setError(err,400))}
       else{
         cb(null, groups);
       }

@@ -1,3 +1,5 @@
+const setError = require('./errors');
+
 'use strict';
 
 module.exports = function(Match) {
@@ -36,7 +38,6 @@ module.exports = function(Match) {
           } else{
             cb(null,"Zaaktualizowano ranking");
           }
-
         })()
       }
     });
