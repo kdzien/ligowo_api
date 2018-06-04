@@ -1,6 +1,6 @@
 {
   "mongodb": {
     "connector": "loopback-connector-mongodb",
-    "url": "mongodb://heroku_r0pnz6w4:mumcp7vk2o460l4ulvbgsk4fn3@ds235609.mlab.com:35609/heroku_r0pnz6w4"
+    "url": "mongodb://heroku_9lrgc1qf:eruul1qklnit3jkb54rb4r2tf5@ds237855.mlab.com:37855/heroku_9lrgc1qf"
   }
 }
