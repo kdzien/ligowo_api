@@ -1,12 +1,6 @@
 {
-  "db": {
-    "host": "localhost",
-    "port": 27017,
-    "url": "",
-    "database": "ligowo",
-    "password": "",
-    "name": "db",
-    "user": "",
-    "connector": "mongodb"
+  "mongodb": {
+    "connector": "loopback-connector-mongodb",
+    "url": "mongodb://heroku_r0pnz6w4:mumcp7vk2o460l4ulvbgsk4fn3@ds235609.mlab.com:35609/heroku_r0pnz6w4"
   }
 }
