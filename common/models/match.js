@@ -47,7 +47,7 @@ module.exports = function(Match) {
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
           let matchesIds = [];
           matches.forEach(elem=>{
-              matchesIds.push(elem.id)
+              matchesIds.push(elem.id.toString())
           })
           Match.app.models.Bet.find({"where":{"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
               let noMatch = [];
