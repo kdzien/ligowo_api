@@ -49,9 +49,16 @@ module.exports = function(Match) {
           matches.forEach(elem=>{
               matchesIds.push(elem.id)
           })
-          Match.app.models.Bet.find({"where":{"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
+          Match.app.models.Bet.find({"where":{"user_id": {"like":`${uid}`}}},(err,bets)=>{
+            let betsTemp = [];
+            bets.forEach(elem=>{
+              if(matchesIds.indexOf(elem.matchId.toString())>-1){
+                betsTemp.push(elem);
+              }
+            })
+
               let noMatch = [];
-              bets.forEach(elem=>{
+              betsTemp.forEach(elem=>{
                   noMatch.push(elem.matchId)
               })
               Match.find({"where":{"group_id": {"like":`${gid.toString()}`}, "id":{"nin": noMatch},"date":{gt:new Date().yyyymmddhhmm()}}},(err,matchesr)=>{
@@ -65,22 +72,27 @@ module.exports = function(Match) {
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
           let matchesIds = [];
           matches.forEach(elem=>{
-              matchesIds.push(elem.id)
+              matchesIds.push(elem.id.toString())
           })
-          console.log()
-          Match.app.models.Bet.find({"where":{"date":{gt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}}},(err,bets)=>{
+          Match.app.models.Bet.find({"where":{"date":{gt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`}}},(err,bets)=>{
+            let betsTemp = [];
+            bets.forEach(elem=>{
+              if(matchesIds.indexOf(elem.matchId.toString())>-1){
+                betsTemp.push(elem);
+              }
+            })
                 let n = 0;
                 (function async(){
-                  if(n<=bets.length-1){
+                  if(n<=betsTemp.length-1){
                     Match.findOne({
-                      where:{"id": `${bets[n].matchId}`}
+                      where:{"id": `${betsTemp[n].matchId}`}
                     },(err,match)=>{
-                      bets[n].match = match;
+                      betsTemp[n].match = match;
                       n++;
                       async();
                     })
                   }else{
-                    cb(null,bets)
+                    cb(null,betsTemp)
                   }
                 })()
           })
@@ -98,25 +110,29 @@ module.exports = function(Match) {
 
   Match.userMatchesDone = function(uid,gid,cb) {
       Match.find({"where":{"group_id": {"like":`${gid.toString()}`}}},(err,matches)=>{
-        console.log(matches)
           let matchesIds = [];
           matches.forEach(elem=>{
-              matchesIds.push(elem.id)
+              matchesIds.push(elem.id.toString())
           })
-          Match.app.models.Bet.find({"where":{"date":{lt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`},'matchId':{"inq" : matchesIds}},include: 'matches'},(err,bets)=>{
-
+          Match.app.models.Bet.find({"where":{"date":{lt:new Date().yyyymmddhhmm()},"user_id": {"like":`${uid}`}},include: 'matches'},(err,bets)=>{
+            let betsTemp = [];
+            bets.forEach(elem=>{
+              if(matchesIds.indexOf(elem.matchId.toString())>-1){
+                betsTemp.push(elem);
+              }
+            })
             let n = 0;
             (function async(){
-              if(n<=bets.length-1){
+              if(n<=betsTemp.length-1){
                 Match.findOne({
-                  where:{"id": `${bets[n].matchId}`}
+                  where:{"id": `${betsTemp[n].matchId}`}
                 },(err,match)=>{
-                  bets[n].match = match;
+                  betsTemp[n].match = match;
                   n++;
                   async();
                 })
               }else{
-                cb(null,bets)
+                cb(null,betsTemp)
               }
             })()
           })
